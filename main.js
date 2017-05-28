@@ -1,4 +1,6 @@
 TESTER = document.getElementById('tester');
+ACTUAL = document.getElementById('actual');
+NORM = document.getElementById('norm');
 
 const num_points = 100;
 const LOCV_percent = 1;
@@ -9,8 +11,20 @@ const num_output_neurons = 1;
 
 const max_sin_output = num_input_neurons;
 
-const x_norm_constant = 1;//num_points;
-const y_norm_constant = 1;//max_sin_output;
+const start_range = 0;
+const end_range = 2*Math.PI;
+
+
+const x_data = _.range(start_range, end_range, (end_range - start_range)/num_points);
+// const x_data = _.range(num_points);
+const y_data = _.map(x_data,
+  (n) => {
+    return Math.sin(n);
+  }
+);
+
+const x_norm_constant = _.max(x_data) - _.min(x_data);//num_points;
+const y_norm_constant = _.max(y_data) - _.min(y_data);//max_sin_output;
 
 const training_options = {
   log: 100,
@@ -21,17 +35,8 @@ const training_options = {
 
 var network = new neataptic.Architect.Perceptron(num_input_neurons, num_hidden_neurons, num_output_neurons);
 
-const x_data = _.range(0, 1, 1/num_points);
-// const x_data = _.range(num_points);
-const y_data = _.map(x_data,
-  (n) => {
-    return Math.sin(n);
-  }
-);
-
 const norm_x_data = norm(x_data);
 const norm_y_data = norm(y_data);
-
 // arayy of objects containing x=[1,2,..,10] and y=sin(x)
 const norm_data = _.map(_.range(num_points),
   (n) => {
@@ -84,26 +89,39 @@ network.train(feed_array, training_options);
 //jStat.meansqerr()
 var y_predicted = _.map(x_data, 
   (x) => {
-    let a = _.min(x_data);
-    let b = _.max(x_data);
-    let c = _.min(y_data);
-    let d = _.max(y_data);
-    let norm_y = network.activate([(( (x - a)) / (b - a))])[0];
-    return (norm_y * (d - c)) + c;
+    // let a = _.min(x_data);
+    // let b = _.max(x_data);
+    // let c = _.min(y_data);
+    // let d = _.max(y_data);
+    // let norm_y = network.activate([(( (x - a)) / (b - a))])[0];
+    // return (norm_y * (d - c)) + c;
+    return network.activate([(x-_.min(x_data))/x_norm_constant])[0] * y_norm_constant + _.min(y_data);
   }
 );
 
 // Tests x vs predicted
-// Plotly.plot( TESTER, [{
-//     x: x_data,
-//     y: y_predicted}], { 
+Plotly.plot( TESTER, [{
+    x: x_data,
+    y: y_predicted}], { 
+    margin: { t: 0 } } );
+
+// Tests x vs predicted
+Plotly.plot( ACTUAL, [{
+    x: x_data,
+    y: y_data}], { 
+    margin: { t: 0 } } );
+    
+// Tests x vs predicted
+// Plotly.plot( NORM, [{
+//     x: norm_x_data,
+//     y: norm_y_data}], { 
 //     margin: { t: 0 } } );
 
 // Tests actual vs predicted
-Plotly.plot( TESTER, [{
-    x: y_predicted,
-    y: y_data}], { 
-    margin: { t: 0 } } );
+// Plotly.plot( TESTER, [{
+//     x: y_predicted,
+//     y: y_data}], { 
+//     margin: { t: 0 } } );
 
 
 /* Current Plotly.js version */
