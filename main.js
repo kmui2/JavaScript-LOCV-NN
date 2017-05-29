@@ -1,6 +1,7 @@
 TESTER = document.getElementById('tester');
 ACTUAL = document.getElementById('actual');
 NORM = document.getElementById('norm');
+RMSE = document.getElementById('rmse');
 
 const num_points = 100;
 const LOCV_percent = 1;
@@ -27,8 +28,8 @@ const x_norm_constant = _.max(x_data) - _.min(x_data);//num_points;
 const y_norm_constant = _.max(y_data) - _.min(y_data);//max_sin_output;
 
 const training_options = {
-  log: 100,
-  // error: 0.03,
+  log: 10,
+  error: 0.0000000001,
   iterations: 1000,
   rate: 0.3
 }
@@ -69,9 +70,6 @@ let norm_testing_data = _.map(testing_data,
 );
 
 
-// console.log("this is the training: " + training_data);
-// console.log("this is the testing: " + testing_data);
-
 let feed_array = _.map(norm_training_data,
   (data_point) => {
     return {
@@ -81,51 +79,17 @@ let feed_array = _.map(norm_training_data,
   }
 );
 
-// console.log("this is the feed array: " + feed_array[0].input);
-
 network.train(feed_array, training_options);
 
+var y_predicted = getPredData(x_data);
 
-//jStat.meansqerr()
-var y_predicted = _.map(x_data, 
-  (x) => {
-    // let a = _.min(x_data);
-    // let b = _.max(x_data);
-    // let c = _.min(y_data);
-    // let d = _.max(y_data);
-    // let norm_y = network.activate([(( (x - a)) / (b - a))])[0];
-    // return (norm_y * (d - c)) + c;
-    return network.activate([(x-_.min(x_data))/x_norm_constant])[0] * y_norm_constant + _.min(y_data);
-  }
-);
+document.getElementById('rmse').innerHTML = "Testing data RMSE: " + calcRMSE(y_predicted,y_data);
 
 // Tests x vs predicted
-Plotly.plot( TESTER, [{
-    x: x_data,
-    y: y_predicted}], { 
-    margin: { t: 0 } } );
+this.plot(y_data, y_predicted, TESTER);
 
 // Tests x vs predicted
-Plotly.plot( ACTUAL, [{
-    x: x_data,
-    y: y_data}], { 
-    margin: { t: 0 } } );
-    
-// Tests x vs predicted
-// Plotly.plot( NORM, [{
-//     x: norm_x_data,
-//     y: norm_y_data}], { 
-//     margin: { t: 0 } } );
-
-// Tests actual vs predicted
-// Plotly.plot( TESTER, [{
-//     x: y_predicted,
-//     y: y_data}], { 
-//     margin: { t: 0 } } );
-
-
-/* Current Plotly.js version */
-console.log( Plotly.BUILD );
+this.plot(x_data, y_data, ACTUAL);
 
 function norm(array) {
   a = _.min(array);
@@ -136,4 +100,32 @@ function norm(array) {
     (p) => {
       return (((ra-rb) * (p - a)) / (b - a)) + rb;
     })
+}
+
+function calcRMSE(arr1, arr2) {
+  return jStat.meansqerr(_.map(_.range(arr1.length), 
+    (i) => {
+      return arr2[i] - arr1[i];
+    })
+  );
+}
+
+function getPredData(data, network) {
+  return _.map(data, 
+    (x) => {
+      return network.activate([(x-_.min(x_data))/x_norm_constant])[0] * y_norm_constant + _.min(y_data);
+    }
+  );
+}
+
+function plot(x_data, y_data,HTML) {
+  Plotly.plot( HTML, [{
+      x: x_data,
+      y: y_data}], { 
+      margin: { t: 0 } } );
+}
+
+function trainData() {
+  var network;
+  return network;
 }
