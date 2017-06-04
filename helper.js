@@ -44,5 +44,8 @@ function plot(x_data, y_data,xlabel,ylabel,HTML) {
   }
   Plotly.plot( HTML, [{
       x: x_data,
-      y: y_data}], layout );
+      y: y_data,
+      mode: 'markers',
+      type: 'scatter'
+    }], layout );
 }
