@@ -27,6 +27,8 @@ input.onchange = function () {
     
 };
 
+
+
 function start(sheet) {
   
     column_headers = sheet[0].slice();
@@ -50,32 +52,11 @@ function start(sheet) {
         return row[0];
       }).slice(0,num_points);
       
-    // num_points = data_matrix.length;
     
     num_input_neurons = 1;
     num_hidden_neurons = 4;
     num_output_neurons = 1;
   
-  
-  
-
-  // num_points = 100;
-  // 
-  // num_input_neurons = 1;
-  // num_hidden_neurons = 4;
-  // num_output_neurons = 1;
-  // 
-  // 
-  // const start_range = 0;
-  // const end_range = 2*Math.PI;
-  // 
-  // x_data = _.range(start_range, end_range, (end_range - start_range)/num_points);
-  // y_data = _.map(x_data,
-  //   (n) => {
-  //     return Math.sin(n);
-  //   }
-  // );
-
   training_options = {
     log: 10,
     error: 0.0000000001,
@@ -83,12 +64,17 @@ function start(sheet) {
     rate: 0.3
   }
 
-  networkObj = this.trainData(x_data, y_data);
-  var y_predicted = this.getPredData(x_data, networkObj.network, y_data);
+  let network, testing_rmse, training_x_data, testing_x_data, training_y_data, testing_y_data;
+  ({network, testing_rmse, training_x_data, testing_x_data, training_y_data, testing_y_data} = this.trainData(x_data, y_data));
+  let y_predicted = this.getPredData(x_data, network, y_data);
+  let testing_y_predicted = this.getPredData(testing_x_data, network, y_data);
+  let training_y_predicted = this.getPredData(training_x_data, network, y_data);
   
-  document.getElementById('rmse').innerHTML = "Testing data RMSE: " + networkObj.testing_rmse;
+  document.getElementById('rmse').innerHTML = "Testing data RMSE: " + testing_rmse;
   
-  this.plot(y_data, y_predicted, 'Actual Y Output', 'Predicted Y Output', TESTER);
-  this.plot(x_data, y_predicted, 'X Data', 'Predicted Y Output', ACTUAL);
+  this.plot(training_y_data, training_y_predicted, 'Actual Y Output', 'Predicted Y Output', 'Training Data', TESTER);
+  this.plot(testing_y_data, testing_y_predicted, 'Actual Y Output', 'Predicted Y Output', 'Testing Data', TESTER);
+  this.plot(x_data, y_predicted, 'X Data', 'Predicted Y Output', null, ACTUAL);
+  
 
 }

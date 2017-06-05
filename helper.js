@@ -31,7 +31,7 @@ function getPredData(input_data, network, output_data) {
   );
 }
 
-function plot(x_data, y_data,xlabel,ylabel,HTML) {
+function plot(x_data, y_data,xlabel,ylabel, name, HTML) {
   if (!xlabel)
     xlabel="X";
   if (!ylabel)
@@ -46,6 +46,7 @@ function plot(x_data, y_data,xlabel,ylabel,HTML) {
       x: x_data,
       y: y_data,
       mode: 'markers',
-      type: 'scatter'
+      type: 'scatter',
+      name: name
     }], layout );
 }

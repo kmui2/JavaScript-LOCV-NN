@@ -52,17 +52,19 @@ function trainData(x_data, y_data) {
     (data_point) => {
       return data_point.x*(_.max(x_data)-_.min(x_data)) + _.min(x_data)
     });
-  
+  let training_y_data = _.map(training_data,
+    (data_point) => {
+      return data_point.y*(_.max(y_data)-_.min(y_data)) + _.min(y_data)
+    });
   let testing_x_data = _.map(testing_data,
     (data_point) => {
       return data_point.x*(_.max(x_data)-_.min(x_data)) + _.min(x_data)
     });
-    
-    
   let testing_y_data = _.map(testing_data,
     (data_point) => {
-      return data_point.y*(_.max(y_data)-_.min(y_data)) - _.min(y_data)
+      return data_point.y*(_.max(y_data)-_.min(y_data)) + _.min(y_data)
     });
+  
   
   // var y_predicted = getPredData(x_data, network);
   let training_y_predicted = getPredData(training_x_data, network, y_data);
@@ -70,6 +72,6 @@ function trainData(x_data, y_data) {
   
   var testing_rmse =  calcRMSE(testing_y_predicted,testing_y_data);
   
-  return {network, testing_rmse, training_x_data, testing_x_data};
+  return {network, testing_rmse, training_x_data, training_y_data, testing_x_data, testing_y_data};
 }
 
