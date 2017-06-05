@@ -75,6 +75,7 @@ function start(sheet) {
   this.plot(training_y_data, training_y_predicted, 'Actual Y Output', 'Predicted Y Output', 'Training Data', TESTER);
   this.plot(testing_y_data, testing_y_predicted, 'Actual Y Output', 'Predicted Y Output', 'Testing Data', TESTER);
   this.plot(x_data, y_predicted, 'X Data', 'Predicted Y Output', null, ACTUAL);
+  this.graphHisto(y_data, y_predicted, 'myDiv');
   
 
 }
