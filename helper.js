@@ -1,13 +1,37 @@
+function createNormOrigDataMatrix(data_matrix) {
+  col_datas = transpose(data_matrix);
+  norm_orig_cols = _.map(col_datas,
+    (col_data) => {
+      return _.map(col_data,
+        (p) => {
+          return {norm: normPoint(p, col_data), orig: p};
+        });
+    });
+  
+  return transpose(norm_orig_cols);
+  
+}
 
-function norm(array) {
-  a = _.min(array);
-  b = _.max(array);
-  ra = 1;
-  rb = 0;
+function transpose(matrix) {
+  var result = [];
+  for (let i = 0; i < matrix[0].length; i++) {
+    result.push(_.map(matrix,
+      (row) => {
+        return row[i];
+      }));
+  }
+  return result;
+}
+
+function norm(array, target_array) {
   return _.map(array,
     (p) => {
-      return (((ra-rb) * (p - a)) / (b - a)) + rb;
+      return (p-_.min(target_array))/(_.max(target_array)-_.min(target_array));
     })
+}
+
+function normPoint(p, target_array) {
+  return (p-_.min(target_array))/(_.max(target_array)-_.min(target_array));
 }
 
 function calcRMSE(arr1, arr2) {
@@ -17,7 +41,15 @@ function calcRMSE(arr1, arr2) {
     })
   );
 }
-
+function getPredDatas(input_data, network, output_data) {
+  return _.map(input_data, 
+    (x_row_datas) => {
+      var temp = network.activate(x_row_datas)[0] 
+      * (_.max(output_data)-_.min(output_data)) + _.min(output_data);
+      return temp;
+    }
+  );
+}
 function getPredData(input_data, network, output_data) {
   return _.map(input_data, 
     (x) => {
@@ -25,7 +57,6 @@ function getPredData(input_data, network, output_data) {
         (x-_.min(input_data))/(_.max(input_data)-_.min(input_data))
       ])[0] 
       * (_.max(output_data)-_.min(output_data)) + _.min(output_data);
-      // console.log(temp)
       return temp;
     }
   );
